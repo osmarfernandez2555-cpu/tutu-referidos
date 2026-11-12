@@ -279,6 +279,14 @@ details .cuerpo li{margin-bottom:6px}
 .sw-copy__body{color:#DDE3EC}
 .sw-copy__tags li{color:#E6EEFB;background:rgba(54,134,247,.18);border-color:rgba(54,134,247,.45)}
 .sw-copy__cta{pointer-events:inherit}
+/* escritorio: el bloque de texto se apoya abajo y crece hacia arriba, así el botón siempre queda en pantalla */
+@media (min-width:861px){
+  .sw-copy{top:auto;bottom:clamp(40px,9vh,110px);width:min(44vw,560px)}
+  .sw-copy__title{font-size:clamp(2.2rem,min(4.2vw,7.4vh),4rem)}
+  .sw-copy__body{font-size:clamp(1rem,min(1.2vw,2.2vh),1.15rem);margin-top:14px}
+  .sw-copy__cta{margin-top:22px}
+  .sw-copylayer::before{width:min(62vw,860px)}
+}
 .sw-btn{min-height:50px;display:inline-flex;align-items:center}
 .sw-btn--primary{background:var(--azul-boton);color:#fff}
 .sw-btn--primary:hover{background:var(--azul-hover)}
