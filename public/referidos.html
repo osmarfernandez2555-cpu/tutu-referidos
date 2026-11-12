@@ -278,6 +278,7 @@ details .cuerpo li{margin-bottom:6px}
 .sw-copy__title .plata{color:var(--azul);white-space:nowrap}
 .sw-copy__body{color:#DDE3EC}
 .sw-copy__tags li{color:#E6EEFB;background:rgba(54,134,247,.18);border-color:rgba(54,134,247,.45)}
+.sw-copy__cta{pointer-events:inherit}
 .sw-btn{min-height:50px;display:inline-flex;align-items:center}
 .sw-btn--primary{background:var(--azul-boton);color:#fff}
 .sw-btn--primary:hover{background:var(--azul-hover)}
@@ -285,7 +286,8 @@ details .cuerpo li{margin-bottom:6px}
 .sw-route__label{color:#141821}
 .sw-hint{color:#DDE3EC}
 .sw-off .sw-sky,.sw-off .sw-stage,.sw-off .sw-copylayer,.sw-off .sw-route,.sw-off .sw-hint,.sw-off .sw-scrollbar{visibility:hidden}
-@media (max-width:860px){.sw-copy__title{font-size:clamp(2rem,9vw,2.9rem)}}
+@media (max-width:860px){.sw-copy__title{font-size:clamp(2rem,9vw,2.9rem)}.sw-hint{display:none}}
+@media (max-height:700px) and (max-width:860px){.sw-copy__body{font-size:.95rem;margin-top:12px}.sw-copy__cta{margin-top:18px}}
 </style>
 </head>
 <body>
@@ -571,8 +573,8 @@ details .cuerpo li{margin-bottom:6px}
     sections: [
       { id:'dato', label:'El dato', still:'/img/tramo1.webp', stillMobile:'/img/tramo1-m.webp', clip:'/vid/tramo1.mp4', clipMobile:'/vid/tramo1-m.mp4', accent:'#3686F7', scroll:1.6, linger:0.35,
         title:'Pasanos un comprador. Cobrá $100.000.',
-        body:'¿Conocés a alguien que busca auto? Cargá su dato. Si compra en Tutu, te pagamos $100.000 cuando se confirma la venta.',
-        tags:['Hasta 5 beneficios por persona','Vigente hasta el 31/12/2026'] },
+        body:'¿Conocés a alguien que busca auto? Cargá su dato. Si compra en Tutu, te pagamos $100.000 cuando se confirma la venta. Vigente hasta el 31/12/2026.',
+        cta:{ primary:{ label:'Cargar un referido', href:'#referir' } } },
       { id:'llamada', label:'La llamada', still:'/img/tramo2.webp', stillMobile:'/img/tramo2-m.webp', clip:'/vid/tramo2.mp4', clipMobile:'/vid/tramo2-m.mp4', accent:'#3686F7',
         title:'Lo atendemos nosotros.',
         body:'Un asesor de Tutu lo llama, le busca el auto y, si quiere financiar, le precalifica el crédito. Vos no tenés que vender nada.' },
