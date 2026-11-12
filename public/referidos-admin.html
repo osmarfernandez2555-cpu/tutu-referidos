@@ -135,7 +135,7 @@ td small{display:block;color:var(--tinta-2);font-size:13px}
     var aPagar = datos.filter(function(r){ return r.estado === 'vendido' && !r.sin_beneficio; }).length;
     if (filtro && filtro !== 'vendido') aPagar = null;
     $('#aPagar').innerHTML = (aPagar === null ? '' : 'A pagar: <strong class="num">$ ' + (aPagar * premio).toLocaleString('es-AR') + '</strong> <span style="color:var(--tinta-2);font-weight:500">(' + aPagar + ')</span> · ') +
-      (camp ? 'Beneficios de la campaña: <strong class="num">' + camp.beneficios_otorgados + ' / ' + camp.tope_total + '</strong> · Cierra el ' + new Date(camp.fin).toLocaleDateString('es-AR') : '');
+      (camp ? 'Beneficios de la campaña: <strong class="num">' + camp.beneficios_otorgados + (camp.tope_total ? ' / ' + camp.tope_total : '') + '</strong> · Cierra el ' + new Date(camp.fin).toLocaleDateString('es-AR') : '');
   }
   function tabla(){
     if (!datos.length) { $('#filas').innerHTML = '<tr><td colspan="9" class="vacio">Todavía no hay referidos con este filtro.</td></tr>'; return; }

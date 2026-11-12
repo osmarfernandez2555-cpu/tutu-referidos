@@ -39,7 +39,7 @@ Cada tramo empieza en la imagen donde termina el anterior, así el recorrido no 
 - `REFERIDOS_INICIO` / `REFERIDOS_FIN` — fechas de la campaña (def. 2026-11-12 00:00 y 2026-12-31 23:59, hora argentina)
 - `REFERIDOS_MADURACION_DIAS` — días que tiene el referido para comprar (def. 60)
 - `REFERIDOS_TOPE_REFERENTE` — beneficios máximos por persona (def. 0 = sin límite)
-- `REFERIDOS_TOPE_TOTAL` — beneficios máximos de la campaña (def. 10)
+- `REFERIDOS_TOPE_TOTAL` — beneficios máximos de la campaña (def. 0 = sin cupo)
 - `REFERIDOS_DIAS_DUPLICADO` — si se pone, un comprador se puede volver a referir pasados esos días
 
 Si cambian las fechas o los topes, hay que cambiarlos también en el texto de `public/referidos.html` y `public/referidos-bases.html`.

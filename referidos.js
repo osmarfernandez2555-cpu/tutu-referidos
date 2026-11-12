@@ -18,7 +18,7 @@
 //    REFERIDOS_FIN          fin de la campaña     (def: 2026-12-31T23:59:59-03:00)
 //    REFERIDOS_MADURACION_DIAS  días que tiene el referido para comprar (def: 60)
 //    REFERIDOS_TOPE_REFERENTE   beneficios máximos por referente (def: 0 = sin límite)
-//    REFERIDOS_TOPE_TOTAL       beneficios máximos en toda la campaña (def: 10)
+//    REFERIDOS_TOPE_TOTAL       beneficios máximos en toda la campaña (def: 0 = sin límite)
 //    REFERIDOS_DIAS_DUPLICADO   opcional: si se pone, un comprador se puede volver a referir pasados esos días.
 //                               Sin esto, un comprador ya cargado (y no descartado) no se puede volver a cargar.
 //
@@ -37,7 +37,7 @@ const INICIO = new Date(env('REFERIDOS_INICIO', '2026-11-12T00:00:00-03:00'))
 const FIN = new Date(env('REFERIDOS_FIN', '2026-12-31T23:59:59-03:00'))
 const MADURACION = parseInt(env('REFERIDOS_MADURACION_DIAS', '60'), 10) || 60
 const TOPE_REF = parseInt(env('REFERIDOS_TOPE_REFERENTE', '0'), 10) || 0   // 0 = sin límite por referente
-const TOPE_TOTAL = parseInt(env('REFERIDOS_TOPE_TOTAL', '10'), 10) || 10
+const TOPE_TOTAL = parseInt(env('REFERIDOS_TOPE_TOTAL', '0'), 10) || 0   // 0 = sin cupo
 
 module.exports = function (app, pool) {
   // ── tabla ────────────────────────────────────────────────────────────────
@@ -226,7 +226,7 @@ module.exports = function (app, pool) {
       const t = await pool.query(`SELECT estado, COUNT(*)::int AS n FROM referidos GROUP BY estado`)
       const totales = Object.fromEntries(ESTADOS.map(e => [e, 0]))
       t.rows.forEach(x => { totales[x.estado] = x.n })
-      // Topes (cláusula NOVENA): sin límite por referente (salvo REFERIDOS_TOPE_REFERENTE) y TOPE_TOTAL en toda la campaña.
+      // Topes (cláusula NOVENA): hoy sin límite por referente ni cupo total; se pueden activar con las variables.
       // Estado "vendido" = auto entregado; el pago vence a los 30 días de la entrega.
       // Se ordenan las ventas confirmadas por fecha de actualización; las que superan un tope se marcan "sin_beneficio".
       const v = await pool.query(`SELECT id, COALESCE(NULLIF(ref_dni,''), ref_tel_norm) AS quien FROM referidos
@@ -235,7 +235,7 @@ module.exports = function (app, pool) {
       let total = 0
       v.rows.forEach(x => {
         porRef[x.quien] = (porRef[x.quien] || 0) + 1
-        if ((TOPE_REF && porRef[x.quien] > TOPE_REF) || total >= TOPE_TOTAL) sinBeneficio.add(x.id)
+        if ((TOPE_REF && porRef[x.quien] > TOPE_REF) || (TOPE_TOTAL && total >= TOPE_TOTAL)) sinBeneficio.add(x.id)
         else { total++; beneficiosDe[x.quien] = (beneficiosDe[x.quien] || 0) + 1 }
       })
       const DIA = 86400000
