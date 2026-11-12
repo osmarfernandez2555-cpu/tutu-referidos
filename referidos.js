@@ -17,8 +17,8 @@
 //    REFERIDOS_INICIO       inicio de la campaña  (def: 2026-11-12T00:00:00-03:00)
 //    REFERIDOS_FIN          fin de la campaña     (def: 2026-12-31T23:59:59-03:00)
 //    REFERIDOS_MADURACION_DIAS  días que tiene el referido para comprar (def: 60)
-//    REFERIDOS_TOPE_REFERENTE   beneficios máximos por referente (def: 5)
-//    REFERIDOS_TOPE_TOTAL       beneficios máximos en toda la campaña (def: 10)
+//    REFERIDOS_TOPE_REFERENTE   beneficios máximos por referente (def: 0 = sin límite)
+//    REFERIDOS_TOPE_TOTAL       beneficios máximos en toda la campaña (def: 0 = sin límite)
 //    REFERIDOS_DIAS_DUPLICADO   opcional: si se pone, un comprador se puede volver a referir pasados esos días.
 //                               Sin esto, un comprador ya cargado (y no descartado) no se puede volver a cargar.
 //
@@ -36,8 +36,8 @@ const env = (k, d) => (process.env[k] === undefined || process.env[k] === '' ? d
 const INICIO = new Date(env('REFERIDOS_INICIO', '2026-11-12T00:00:00-03:00'))
 const FIN = new Date(env('REFERIDOS_FIN', '2026-12-31T23:59:59-03:00'))
 const MADURACION = parseInt(env('REFERIDOS_MADURACION_DIAS', '60'), 10) || 60
-const TOPE_REF = parseInt(env('REFERIDOS_TOPE_REFERENTE', '5'), 10) || 5
-const TOPE_TOTAL = parseInt(env('REFERIDOS_TOPE_TOTAL', '10'), 10) || 10
+const TOPE_REF = parseInt(env('REFERIDOS_TOPE_REFERENTE', '0'), 10) || 0   // 0 = sin límite por referente
+const TOPE_TOTAL = parseInt(env('REFERIDOS_TOPE_TOTAL', '0'), 10) || 0   // 0 = sin cupo
 
 module.exports = function (app, pool) {
   // ── tabla ────────────────────────────────────────────────────────────────
@@ -79,7 +79,8 @@ module.exports = function (app, pool) {
     )`)
     .then(() => pool.query(`ALTER TABLE referidos ADD COLUMN IF NOT EXISTS ref_dni TEXT,
                                                    ADD COLUMN IF NOT EXISTS ref_email TEXT,
-                                                   ADD COLUMN IF NOT EXISTS comp_email TEXT`))
+                                                   ADD COLUMN IF NOT EXISTS comp_email TEXT,
+                                                   ADD COLUMN IF NOT EXISTS entregado_en TIMESTAMPTZ`))
     .then(() => pool.query('CREATE INDEX IF NOT EXISTS referidos_comp_tel_idx ON referidos (comp_tel_norm)'))
     .then(() => console.log('✅ Tabla referidos lista'))
     .catch(e => console.error('❌ Tabla referidos:', e.message))
@@ -225,7 +226,8 @@ module.exports = function (app, pool) {
       const t = await pool.query(`SELECT estado, COUNT(*)::int AS n FROM referidos GROUP BY estado`)
       const totales = Object.fromEntries(ESTADOS.map(e => [e, 0]))
       t.rows.forEach(x => { totales[x.estado] = x.n })
-      // Topes (cláusula NOVENA): hasta TOPE_REF beneficios por referente y TOPE_TOTAL en toda la campaña.
+      // Topes (cláusula NOVENA): hoy sin límite por referente ni cupo total; se pueden activar con las variables.
+      // Estado "vendido" = auto entregado; el pago vence a los 30 días de la entrega.
       // Se ordenan las ventas confirmadas por fecha de actualización; las que superan un tope se marcan "sin_beneficio".
       const v = await pool.query(`SELECT id, COALESCE(NULLIF(ref_dni,''), ref_tel_norm) AS quien FROM referidos
                                    WHERE estado IN ('vendido','pagado') ORDER BY COALESCE(pagado_en, actualizado), id`)
@@ -233,7 +235,7 @@ module.exports = function (app, pool) {
       let total = 0
       v.rows.forEach(x => {
         porRef[x.quien] = (porRef[x.quien] || 0) + 1
-        if (porRef[x.quien] > TOPE_REF || total >= TOPE_TOTAL) sinBeneficio.add(x.id)
+        if ((TOPE_REF && porRef[x.quien] > TOPE_REF) || (TOPE_TOTAL && total >= TOPE_TOTAL)) sinBeneficio.add(x.id)
         else { total++; beneficiosDe[x.quien] = (beneficiosDe[x.quien] || 0) + 1 }
       })
       const DIA = 86400000
@@ -261,6 +263,8 @@ module.exports = function (app, pool) {
         if (!ESTADOS.includes(b.estado)) return res.status(400).json({ error: 'Estado inválido.' })
         vals.push(b.estado); sets.push(`estado = $${vals.length}`)
         sets.push(b.estado === 'pagado' ? `pagado_en = COALESCE(pagado_en, NOW())` : `pagado_en = NULL`)
+        // "vendido" = auto entregado: guarda la fecha de entrega (el pago vence 30 días después)
+        sets.push(['vendido', 'pagado'].includes(b.estado) ? `entregado_en = COALESCE(entregado_en, NOW())` : `entregado_en = NULL`)
       }
       if (b.notas !== undefined) { vals.push(txt(b.notas, 2000)); sets.push(`notas = $${vals.length}`) }
       if (b.vendedor !== undefined) { vals.push(txt(b.vendedor, 60)); sets.push(`vendedor = $${vals.length}`) }
@@ -278,7 +282,7 @@ module.exports = function (app, pool) {
       const r = await pool.query('SELECT * FROM referidos ORDER BY id DESC')
       const cols = ['codigo', 'creado', 'estado', 'ref_nombre', 'ref_tel', 'ref_dni', 'ref_email', 'ref_alias', 'comp_nombre', 'comp_tel', 'comp_email', 'comp_localidad',
         'marca', 'modelo', 'anio', 'moneda', 'presupuesto', 'entrega', 'usado_marca_modelo', 'usado_anio', 'usado_km',
-        'financia', 'comp_dni', 'garantes', 'comentarios', 'vendedor', 'notas', 'pagado_en']
+        'financia', 'comp_dni', 'garantes', 'comentarios', 'vendedor', 'notas', 'entregado_en', 'pagado_en']
       const cel = v => {
         if (v == null) return ''
         if (v instanceof Date) v = new Date(v.getTime() - 3 * 3600 * 1000).toISOString().slice(0, 16).replace('T', ' ')
