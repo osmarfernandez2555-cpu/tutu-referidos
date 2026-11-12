@@ -266,6 +266,26 @@ details .cuerpo li{margin-bottom:6px}
 .cta-movil{position:fixed;left:16px;right:16px;bottom:calc(14px + var(--safe-b));z-index:40;display:none}
 .cta-movil .btn{width:100%}
 @media (max-width:720px){.cta-movil.ver{display:block}}
+
+/* ── recorrido animado (scroll-world) ──────── */
+.top{z-index:90}
+.ruta,.form-sec,.bases,.pie{position:relative;z-index:70}
+.sw-root{--sw-bg:#0E1116;--sw-ink:#F4F6FA;--sw-ink-soft:#B4BFCE;--sw-accent:#3686F7;--sw-font-display:"Archivo","DM Sans",sans-serif;--sw-font-body:"DM Sans",system-ui,sans-serif}
+.sw-topbar{display:none}
+.sw-scrollbar{top:calc(64px + var(--safe-t))}
+.sw-copy__num{font-family:var(--f-body);font-variant-numeric:tabular-nums;font-weight:600;font-size:.82rem;letter-spacing:.04em;color:var(--sw-ink-soft)}
+.sw-copy__title{font-style:italic;font-weight:900;font-stretch:106%;letter-spacing:-.03em;line-height:.98;text-wrap:balance}
+.sw-copy__title .plata{color:var(--azul);white-space:nowrap}
+.sw-copy__body{color:#DDE3EC}
+.sw-copy__tags li{color:#E6EEFB;background:rgba(54,134,247,.18);border-color:rgba(54,134,247,.45)}
+.sw-btn{min-height:50px;display:inline-flex;align-items:center}
+.sw-btn--primary{background:var(--azul-boton);color:#fff}
+.sw-btn--primary:hover{background:var(--azul-hover)}
+.sw-btn--ghost{color:#F4F6FA;border-color:rgba(244,246,250,.35)}
+.sw-route__label{color:#141821}
+.sw-hint{color:#DDE3EC}
+.sw-off .sw-sky,.sw-off .sw-stage,.sw-off .sw-copylayer,.sw-off .sw-route,.sw-off .sw-hint,.sw-off .sw-scrollbar{visibility:hidden}
+@media (max-width:860px){.sw-copy__title{font-size:clamp(2rem,9vw,2.9rem)}}
 </style>
 </head>
 <body>
@@ -285,40 +305,8 @@ details .cuerpo li{margin-bottom:6px}
 </header>
 
 <main>
-  <section class="hero" aria-labelledby="h-hero">
-    <div class="wrap">
-      <div>
-        <h1 id="h-hero">Pasanos un comprador. Cobrá <span class="plata num">$100.000</span>.</h1>
-        <p class="lead">¿Conocés a alguien que está buscando auto? Cargá su dato. <strong>Si compra en Tutu, te pagamos $100.000</strong> cuando se confirma la venta.</p>
-        <div class="acciones">
-          <a class="btn btn-pri" href="#referir">Cargar un referido
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          <a class="btn btn-sec" href="#como">Cómo funciona</a>
-        </div>
-        <ul class="hechos">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Hasta 5 beneficios por persona</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Vos pasás el dato, nosotros lo atendemos</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Vigente hasta el 31/12/2026</li>
-        </ul>
-      </div>
-      <div class="colgante" aria-hidden="true">
-        <div class="aro"></div>
-        <div class="llavero">
-          <div class="tag">
-            <div class="tag-head"><b>REFERIDO</b><span>Tutu Automotores</span></div>
-            <dl>
-              <dt>Comprador</dt><dd>Martín G.</dd>
-              <dt>Busca</dt><dd>Peugeot 208 · 2022</dd>
-              <dt>Presupuesto</dt><dd class="num">$ 22.000.000</dd>
-              <dt>Entrega usado</dt><dd>Sí, Gol 2014</dd>
-              <dt>Financia</dt><dd>Sí</dd>
-            </dl>
-            <div class="premio"><small>Se paga al<br>confirmar la venta</small><strong class="num">$100.000</strong></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <h1 class="sr">Club de Referidos de Tutu Automotores: pasanos un comprador y cobrá $100.000 si se concreta la venta</h1>
+  <div id="world" class="mundo" role="region" aria-label="Recorrido: cómo funciona el Club de Referidos"></div>
 
   <section class="ruta" id="como" aria-labelledby="h-como">
     <div class="wrap">
@@ -572,6 +560,43 @@ details .cuerpo li{margin-bottom:6px}
 
 <div class="cta-movil" id="ctaMovil"><a class="btn btn-pri" href="#referir">Cargar un referido</a></div>
 
+<script src="/js/scroll-world.js"></script>
+<script>
+(function(){
+  var mundo = document.getElementById('world');
+  mountScrollWorld(mundo, {
+    nav: false, atmosphere: false, crossfade: 0.1,
+    hint: 'Deslizá',
+    diveScroll: 1.35,
+    sections: [
+      { id:'dato', label:'El dato', still:'/img/tramo1.webp', stillMobile:'/img/tramo1-m.webp', clip:'/vid/tramo1.mp4', clipMobile:'/vid/tramo1-m.mp4', accent:'#3686F7', scroll:1.6, linger:0.35,
+        title:'Pasanos un comprador. Cobrá $100.000.',
+        body:'¿Conocés a alguien que busca auto? Cargá su dato. Si compra en Tutu, te pagamos $100.000 cuando se confirma la venta.',
+        tags:['Hasta 5 beneficios por persona','Vigente hasta el 31/12/2026'] },
+      { id:'llamada', label:'La llamada', still:'/img/tramo2.webp', stillMobile:'/img/tramo2-m.webp', clip:'/vid/tramo2.mp4', clipMobile:'/vid/tramo2-m.mp4', accent:'#3686F7',
+        title:'Lo atendemos nosotros.',
+        body:'Un asesor de Tutu lo llama, le busca el auto y, si quiere financiar, le precalifica el crédito. Vos no tenés que vender nada.' },
+      { id:'salon', label:'El salón', still:'/img/tramo3.webp', stillMobile:'/img/tramo3-m.webp', clip:'/vid/tramo3.mp4', clipMobile:'/vid/tramo3-m.mp4', accent:'#3686F7',
+        title:'Elige su auto.',
+        body:'0 km o usado, con su auto en parte de pago y la financiación que le sirva.' },
+      { id:'venta', label:'La venta', still:'/img/tramo4.webp', stillMobile:'/img/tramo4-m.webp', clip:'/vid/tramo4.mp4', clipMobile:'/vid/tramo4-m.mp4', accent:'#3686F7',
+        title:'Firma y se lo lleva.',
+        body:'Cuando firma y paga la seña o el anticipo, la venta queda confirmada.' },
+      { id:'cobro', label:'El cobro', still:'/img/tramo5.webp', stillMobile:'/img/tramo5-m.webp', clip:'/vid/tramo5.mp4', clipMobile:'/vid/tramo5-m.mp4', accent:'#3686F7', scroll:1.5, linger:0.3,
+        title:'Y vos cobrás $100.000.',
+        body:'Te transferimos dentro de los 30 días de confirmada la venta. Cargá tu referido ahora.',
+        cta:{ primary:{ label:'Cargar un referido', href:'#referir' }, secondary:{ label:'Ver las bases', href:'/referidos/bases' } } }
+    ],
+    connectors: []
+  });
+  // el monto en azul dentro de los títulos
+  document.querySelectorAll('.sw-copy__title').forEach(function(h){ h.innerHTML = h.innerHTML.replace('$100.000', '<span class="plata">$100.000</span>'); });
+  // apagar las capas fijas del recorrido cuando ya se pasó
+  var track = mundo.querySelector('.sw-track');
+  function apagar(){ mundo.classList.toggle('sw-off', track.getBoundingClientRect().bottom < 0); }
+  window.addEventListener('scroll', apagar, { passive:true }); apagar();
+})();
+</script>
 <script>
 (function(){
   'use strict';
@@ -851,14 +876,13 @@ details .cuerpo li{margin-bottom:6px}
 
   // botón flotante en celular: visible fuera del formulario
   var cta = $('#ctaMovil');
-  if ('IntersectionObserver' in window){
-    var vistos = new Set();
-    var io = new IntersectionObserver(function(es){
-      es.forEach(function(e){ if (e.isIntersecting) vistos.add(e.target); else vistos.delete(e.target); });
-      cta.classList.toggle('ver', vistos.size === 0);
-    }, { threshold: 0 });
-    io.observe($('.hero .acciones')); io.observe($('#referir')); io.observe($('.pie'));
+  function ctaMovil(){
+    var vh = window.innerHeight, ref = $('#referir').getBoundingClientRect(), pie = $('.pie').getBoundingClientRect();
+    var tapado = (ref.top < vh && ref.bottom > 0) || pie.top < vh;
+    var trk = document.querySelector('.sw-track'), fuera = !trk || trk.getBoundingClientRect().bottom < vh * 0.5;
+    cta.classList.toggle('ver', !tapado && fuera);
   }
+  window.addEventListener('scroll', ctaMovil, { passive: true }); ctaMovil();
 
   restaurar();
 
