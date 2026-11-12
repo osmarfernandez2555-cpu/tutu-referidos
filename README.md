@@ -18,6 +18,12 @@ Servidor Node (Express) con su propia base PostgreSQL, independiente de Ruthina.
 - `public/referidos.html` — landing
 - `public/referidos-bases.html` — Términos y Condiciones
 - `public/referidos-admin.html` — panel
+- `public/js/scroll-world.js` — motor del recorrido animado (skill scroll-world, MIT)
+- `public/vid/tramo1..5.mp4` — recorrido horizontal (1280×720) · `tramoN-m.mp4` vertical para celular (720×1280)
+- `public/img/tramo1..5.webp` — primer cuadro de cada tramo (se muestra mientras carga el video)
+
+Los videos se generaron en Google Flow (Veo 3.1 Fast), proyecto "Tutu Referidos - recorrido".
+Cada tramo empieza en la imagen donde termina el anterior, así el recorrido no tiene cortes.
 
 ## Deploy en Railway
 
